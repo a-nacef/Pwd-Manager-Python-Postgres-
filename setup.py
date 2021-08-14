@@ -2,8 +2,7 @@ import os
 import psycopg2
 import json
 
-config = open("config.json", "r")
-config = json.loads(config.read())
+config = json.loads(open("config.json", "r").read())
 
 def setupdb(dbcurr,conn): 
     queries = ["CREATE TABLE platforms(name varchar(20) PRIMARY KEY);", "CREATE TABLE passwords(id INT PRIMARY KEY, val varchar(50), plt varchar(20) REFERENCES platforms(name) ON DELETE CASCADE);"]
