@@ -1,8 +1,8 @@
-import os
 import psycopg2
 import json
 
 config = json.loads(open("config.json", "r").read())
+
 
 def setupdb(dbcurr,conn): 
     queries = ["CREATE TABLE platforms(name varchar(20) PRIMARY KEY);", "CREATE TABLE passwords(id INT PRIMARY KEY, val varchar(50), plt varchar(20) REFERENCES platforms(name) ON DELETE CASCADE);"]
@@ -20,7 +20,6 @@ def setupdb(dbcurr,conn):
         except:
             print("Table creation error!")
             conn.close()
-            cur.close()
 
 
 
@@ -33,5 +32,11 @@ if __name__ == '__main__':
         print("Connected.")
     except:
         print("Connection failed!")
-
+    #create the necessary tables
     setupdb(cur,conn)
+    #Create the pgcrypto extension to encrypt the passwords column
+    try:
+        cur.execute("CREATE EXTENSION pgcrypto;")
+    except:
+        print("Encryption module already exists.")
+    conn.close()
