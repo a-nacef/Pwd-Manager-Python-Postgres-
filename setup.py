@@ -36,4 +36,3 @@ if __name__ == '__main__':
         print("Connection failed!")
 
     setupdb(cur,conn)
-    print(config)
