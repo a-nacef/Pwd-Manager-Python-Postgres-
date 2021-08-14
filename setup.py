@@ -1,7 +1,9 @@
 import os
 import psycopg2
+import json
 
-
+config = open("config.json", "r")
+config = json.loads(config.read())
 
 def setupdb(dbcurr,conn): 
     queries = ["CREATE TABLE platforms(name varchar(20) PRIMARY KEY);", "CREATE TABLE passwords(id INT PRIMARY KEY, val varchar(50), plt varchar(20) REFERENCES platforms(name) ON DELETE CASCADE);"]
@@ -27,10 +29,11 @@ if __name__ == '__main__':
     print("Welcome to the password manager setup process.")
     #Connect to an existing db
     try:
-        conn = psycopg2.connect("dbname=PwdManager user=postgres")
+        conn = psycopg2.connect(f"dbname={config['dbname']} user={config['user']}")
         cur = conn.cursor()
         print("Connected.")
     except:
         print("Connection failed!")
 
     setupdb(cur,conn)
+    print(config)
