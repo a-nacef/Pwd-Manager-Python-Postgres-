@@ -1,4 +1,4 @@
-#import psycopg2
+import psycopg2
 from fernet import Fernet
 import os
 import keyboard
@@ -18,16 +18,17 @@ def decryptdata(msg):
 
 
 def addpassword(pwd, platform):
-    return curr.execute("")
-
-
+    tempid = uuid.uuid1()
+    curr.execute(f"INSERT INTO passwords (id,val,plt) VALUES ({tempid}, {pwd}, {platform});")
 
 def addplatform(platform):
+    curr.execute(f"INSERT INTO platforms (name) VALUES ({platform});")
     return
+
 
 
 def getpassword(platform):
-    return
+    return curr.execute(f"SELECT val FROM passwords where plt = {platform}").fetchone()[0]
 
 
 
@@ -41,11 +42,11 @@ def main():
            b: Add a platform
            c: Get password
         """)
-        if lower(command) = 'a':
+        if lower(command) == 'a':
             addpassword()
-        elif lower(command) = 'b':
+        elif lower(command) == 'b':
             addplatform()
-        elif lower(command) = 'c':
+        elif lower(command) == 'c':
             getpassword()
     conn.commit()
     conn.close()
