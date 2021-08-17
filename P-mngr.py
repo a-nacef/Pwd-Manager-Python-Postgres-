@@ -1,9 +1,10 @@
 import psycopg2
 from fernet import Fernet
 import os
-import keyboard
-import uuid
+import json
 
+
+config = json.loads(open("config.json", "r").read())
 command = ""
 key = bytes(os.environ["pwdkey"], "utf-8")
 f = Fernet(key)
@@ -17,37 +18,46 @@ def decryptdata(msg):
     return f.decrypt(msg)
 
 
-def addpassword(pwd, platform):
-    tempid = uuid.uuid1()
-    curr.execute(f"INSERT INTO passwords (id,val,plt) VALUES ({tempid}, {pwd}, {platform});")
+def addpassword():
+    pwd = encryptdata(input("Enter a password\n")).decode("utf-8")
+    platform = input("Enter a platform\n")
+    curr.execute(f"SELECT EXISTS( SELECT name FROM platforms where name = '{platform}')")
+    if curr.fetchone()[0]:
+        curr.execute(f"INSERT INTO passwords (val,plt) VALUES ('{pwd}', '{platform}');")
+    else:
+        print("Platform doesnt exist.")
 
-def addplatform(platform):
-    curr.execute(f"INSERT INTO platforms (name) VALUES ({platform});")
+def addplatform():
+    platform = input("Enter a platform\n")
+    curr.execute(f"INSERT INTO platforms (name) VALUES ('{platform}');")
     return
 
 
 
-def getpassword(platform):
-    return curr.execute(f"SELECT val FROM passwords where plt = {platform}").fetchone()[0]
+def getpassword():
+    platform = input("Enter a platform\n")
+    return decryptdata(curr.execute(f"SELECT val FROM passwords where plt = {platform}").fetchall())
 
 
 
 
 
 def main():
-    print("Welcome to your password manager, press Q to quit the program")
-    while(lower(command) != 'q'):
-        print(""""
-           a: Add a password
-           b: Add a platform
-           c: Get password
+    command = ''
+    while(command.lower() != 'q'):
+        command = input("""Welcome to your password manager, press Q to quit the program\n
+           a: Add a password\n
+           b: Add a platform\n
+           c: Get password\n
         """)
-        if lower(command) == 'a':
+        if command.lower() == 'a':
             addpassword()
-        elif lower(command) == 'b':
+        elif command.lower() == 'b':
             addplatform()
-        elif lower(command) == 'c':
-            getpassword()
+        elif command.lower() == 'c':
+            passwords = getpassword()
+            for pwd in passwords:
+                print(pwd)
     conn.commit()
     conn.close()
                  
