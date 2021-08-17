@@ -41,7 +41,9 @@ def getpassword():
     data = curr.fetchall()
     for pwd in data:
         print(pwd[0])
-        yield pwd[0].encode()
+        print(f"bytes version = {bytes(pwd[0],'utf-8')}")
+        print(f"decrypt = {decryptdata(bytes(pwd[0],'utf-8'))}")
+        yield bytes(pwd[0], "utf-8")
         
 
 
@@ -63,7 +65,7 @@ def main():
         elif command.lower() == 'c':
             passwords = getpassword()
             for pwd in passwords:
-                print(pwd)
+                print(decryptdata(pwd))
     conn.commit()
     conn.close()
                  
