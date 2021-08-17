@@ -5,7 +5,8 @@ config = json.loads(open("config.json", "r").read())
 
 
 def setupdb(dbcurr,conn): 
-    queries = ["CREATE TABLE platforms(name varchar(20) PRIMARY KEY);", "CREATE TABLE passwords(id INT PRIMARY KEY, val varchar(50), plt varchar(20) REFERENCES platforms(name) ON DELETE CASCADE);"]
+    queries = ["CREATE TABLE platforms(name varchar(20) PRIMARY KEY);", 
+    "CREATE TABLE passwords(id bigint DEFAULT nextval('pwd') PRIMARY KEY, val varchar(90), plt varchar(20) REFERENCES platforms(name) ON DELETE CASCADE);"]
     dbcurr.execute("""
         SELECT EXISTS(
             SELECT * FROM pg_tables

@@ -2,7 +2,7 @@ import psycopg2
 from fernet import Fernet
 import os
 import json
-
+import base64
 
 config = json.loads(open("config.json", "r").read())
 command = ""
@@ -19,7 +19,7 @@ def decryptdata(msg):
 
 
 def addpassword():
-    pwd = encryptdata(input("Enter a password\n")).decode("utf-8")
+    pwd = str(encryptdata(input("Enter a password\n")))
     platform = input("Enter a platform\n")
     curr.execute(f"SELECT EXISTS( SELECT name FROM platforms where name = '{platform}')")
     if curr.fetchone()[0]:
@@ -36,7 +36,11 @@ def addplatform():
 
 def getpassword():
     platform = input("Enter a platform\n")
-    return decryptdata(curr.execute(f"SELECT val FROM passwords where plt = {platform}").fetchall())
+    curr.execute(f"SELECT val FROM passwords where plt = '{platform}'")
+    data = curr.fetchall()
+    for pwd in data:
+        yield pwd[0]
+        
 
 
 
@@ -44,11 +48,13 @@ def getpassword():
 
 def main():
     command = ''
+    print("Welcome to your password manager!")
     while(command.lower() != 'q'):
-        command = input("""Welcome to your password manager, press Q to quit the program\n
+        command = input("""
            a: Add a password\n
            b: Add a platform\n
            c: Get password\n
+           q: quit\n
         """)
         if command.lower() == 'a':
             addpassword()
