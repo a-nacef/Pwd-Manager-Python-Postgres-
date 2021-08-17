@@ -19,11 +19,12 @@ def decryptdata(msg):
 
 
 def addpassword():
-    pwd = str(encryptdata(input("Enter a password\n")))
+    pwd = encryptdata(input("Enter a password\n"))
+    print(pwd, str(pwd))
     platform = input("Enter a platform\n")
     curr.execute(f"SELECT EXISTS( SELECT name FROM platforms where name = '{platform}')")
     if curr.fetchone()[0]:
-        curr.execute(f"INSERT INTO passwords (val,plt) VALUES ('{pwd}', '{platform}');")
+        curr.execute(f"INSERT INTO passwords (val,plt) VALUES ({str(pwd).replace('b', '', 1)}, '{platform}');")
     else:
         print("Platform doesnt exist.")
 
@@ -39,10 +40,9 @@ def getpassword():
     curr.execute(f"SELECT val FROM passwords where plt = '{platform}'")
     data = curr.fetchall()
     for pwd in data:
-        yield pwd[0]
+        print(pwd[0])
+        yield pwd[0].encode()
         
-
-
 
 
 
