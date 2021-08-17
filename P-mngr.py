@@ -40,9 +40,11 @@ def getpassword():
     curr.execute(f"SELECT val FROM passwords where plt = '{platform}'")
     data = curr.fetchall()
     for pwd in data:
-        print(pwd[0])
         print(f"bytes version = {bytes(pwd[0],'utf-8')}")
-        print(f"decrypt = {decryptdata(bytes(pwd[0],'utf-8'))}")
+        try:
+            print(f"decrypt = {decryptdata(bytes(pwd[0],'utf-8'))}")
+        except:
+            print("nik rab omek")
         yield bytes(pwd[0], "utf-8")
         
 
@@ -65,7 +67,8 @@ def main():
         elif command.lower() == 'c':
             passwords = getpassword()
             for pwd in passwords:
-                print(decryptdata(pwd))
+                pass
+                #print(decryptdata(pwd))
     conn.commit()
     conn.close()
                  
