@@ -2,7 +2,7 @@ import psycopg2
 from fernet import Fernet
 import os
 import json
-import base64
+import re
 
 config = json.loads(open("config.json", "r").read())
 command = ""
@@ -20,10 +20,10 @@ def decryptdata(msg):
 
 def addpassword():
     pwd = encryptdata(input("Enter a password\n"))
-    print(pwd, str(pwd))
     platform = input("Enter a platform\n")
     curr.execute(f"SELECT EXISTS( SELECT name FROM platforms where name = '{platform}')")
     if curr.fetchone()[0]:
+        #used replace here cause using str() on a bytes string keep the leading 'b' for some reason?
         curr.execute(f"INSERT INTO passwords (val,plt) VALUES ({str(pwd).replace('b', '', 1)}, '{platform}');")
     else:
         print("Platform doesnt exist.")
@@ -40,11 +40,6 @@ def getpassword():
     curr.execute(f"SELECT val FROM passwords where plt = '{platform}'")
     data = curr.fetchall()
     for pwd in data:
-        print(f"bytes version = {bytes(pwd[0],'utf-8')}")
-        try:
-            print(f"decrypt = {decryptdata(bytes(pwd[0],'utf-8'))}")
-        except:
-            print("nik rab omek")
         yield bytes(pwd[0], "utf-8")
         
 
@@ -67,8 +62,8 @@ def main():
         elif command.lower() == 'c':
             passwords = getpassword()
             for pwd in passwords:
-                pass
-                #print(decryptdata(pwd))
+                temp = str(decryptdata(pwd))
+                print(temp[2:len(temp)-1])
     conn.commit()
     conn.close()
                  
